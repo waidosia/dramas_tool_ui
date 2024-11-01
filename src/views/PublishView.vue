@@ -10,7 +10,7 @@
             <div slot="header" class="card-header">信息输入区</div>
 
             <el-form-item label="视频文件夹">
-              <el-select v-model="form.videoFolder" filterable placeholder="请选择视频所属文件夹">
+              <el-select v-model="form.videoFolder" filterable placeholder="请选择视频所属文件夹" @click="fetchVideoFolders">
                 <el-option v-for="videoFolder in videoFolders" :key="videoFolder.name" :label="videoFolder.name"
                            :value="videoFolder.path"></el-option>
               </el-select>
@@ -42,23 +42,28 @@
               <el-form-item label="季数" style="flex: 0;">
                 <el-input-number
                     v-model="form.season"
-                    :max="10"
+                    :max="99"
                     :min="1"
                     controls-position="right"
                     size="small"
                 />
               </el-form-item>
+               <el-form-item label="片源" style="flex: 1;">
+                <el-select v-model="form.film_source" placeholder="选择片源">
+                  <el-option label="WEB-DL" value="WEB-DL"></el-option>
+                </el-select>
+              </el-form-item>
               <el-form-item label="来源" style="flex: 1;">
                 <el-select v-model="form.source" placeholder="选择来源">
-                  <el-option label="网络付费短剧" value="1"></el-option>
-                  <el-option label="抖音短剧" value="2"></el-option>
-                  <el-option label="快手短剧" value="3"></el-option>
+                  <el-option label="网络付费短剧" value="网络付费短剧"></el-option>
+                  <el-option label="抖音短剧" value="抖音短剧"></el-option>
+                  <el-option label="快手短剧" value="快手短剧"></el-option>
                 </el-select>
               </el-form-item>
 
               <el-form-item label="小组" style="flex: 1;">
                 <el-select v-model="form.group" placeholder="选择小组">
-                  <el-option label="GodDramas" value="1"></el-option>
+                  <el-option label="GodDramas" value="GodDramas"></el-option>
                 </el-select>
               </el-form-item>
             </div>
@@ -82,14 +87,14 @@
 
             <el-form-item label="分类">
               <el-checkbox-group v-model="form.category">
-                <el-checkbox label="剧情" value="1"/>
-                <el-checkbox label="爱情" value="2"/>
-                <el-checkbox label="穿越" value="3"/>
-                <el-checkbox label="重生" value="4"/>
-                <el-checkbox label="逆袭" value="5"/>
-                <el-checkbox label="都市" value="6"/>
-                <el-checkbox label="喜剧" value="7"/>
-                <el-checkbox label="科幻" value="8"/>
+                <el-checkbox label="剧情" value="剧情"/>
+                <el-checkbox label="爱情" value="爱情"/>
+                <el-checkbox label="穿越" value="穿越"/>
+                <el-checkbox label="重生" value="重生"/>
+                <el-checkbox label="逆袭" value="逆袭"/>
+                <el-checkbox label="都市" value="都市"/>
+                <el-checkbox label="喜剧" value="喜剧"/>
+                <el-checkbox label="科幻" value="科幻"/>
               </el-checkbox-group>
             </el-form-item>
           </el-card>
@@ -142,7 +147,7 @@
       <!-- 操作按钮展示 -->
       <el-row :gutter="20" class="buttons-row mt-20">
         <el-col :span="6">
-          <el-button block type="primary">1. 重命名文件夹生成</el-button>
+          <el-button block type="primary" @click="reName">1. 重命名文件夹生成</el-button>
         </el-col>
         <el-col :span="6">
           <el-button block type="primary">2. 生成命名种子</el-button>
@@ -180,6 +185,8 @@ export default {
         year: 0,
         // 发布当前季
         season: 0,
+        // 片源
+        film_source:'',
         // 短剧来源
         source: '',
         // 发布小组
@@ -217,11 +224,12 @@ export default {
         //影片信息标
         videoInfoIcon:'',
         // 截图标
-        screenshotIcon:''
+        screenshotIcon:'',
+        // 第一集路径
+        first_file_name: '',
       },
       videoFolders: [],
       selectedFile: null,
-
     };
   },
   created() {
@@ -231,7 +239,9 @@ export default {
   methods: {
     initData(){
       this.form.year = date;
-      this.form.group = "1";
+      this.form.group = "GodDramas";
+      this.form.source = "网络付费短剧";
+      this.form.film_source = "WEB-DL";
       this.form.reference = "[quote][size=4]因组内调整，之后新发布，均禁止[color=Red]转载 [color=Black]谢谢！！[/size][/quote]"
       this.form.groupIcon = "https://img.pterclub.com/images/2024/01/10/GodDramas-.png"
       this.form.videoInfoIcon = "https://img.pterclub.com/images/2024/01/10/49401952f8353abd4246023bff8de2cc.png"
@@ -333,6 +343,44 @@ export default {
       } else {
         this.$message.warning("请输入有效的链接或选择一个文件");
       }
+    },
+    reName(){
+       axios
+          .post("http://127.0.0.1:5000/api/rename",
+              {
+                videoFolder: this.form.videoFolder,
+                cnName: this.form.cnName,
+                enName: this.form.enName,
+                year: this.form.year.getFullYear(),
+                season : this.form.season,
+                category: this.form.category,
+                source : this.form.source,
+                film_source : this.form.film_source,
+                group : this.form.group,
+              })
+          .then((response) => {
+             console.log(response)
+            if (response.data.code === 200) {
+              this.form.mainTitle = response.data.data.main_title;
+              this.form.first_file_name = response.data.data.first_file_name;
+              this.form.subTitle = response.data.data.second_title;
+              this.fetchVideoFolders()
+               const match = this.videoFolders.find(folder => folder.path === response.data.data.new_folder_path);
+              if (match) {
+                this.form.videoFolder = response.data.data.new_folder_path;
+              } else if (this.videoFolders.length) {
+                // 如果未找到指定路径，则选择第一个文件夹
+                this.form.videoFolder = this.videoFolders[0].path;
+              }
+              this.$message.success("获取标准命名成功");
+            } else{
+              this.$message.error(response.data.message);
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            this.$message.error("在线链接上传失败");
+          });
     },
 
     // 判断输入框内容是否为在线图片链接
