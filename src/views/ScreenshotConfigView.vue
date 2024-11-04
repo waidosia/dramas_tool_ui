@@ -62,7 +62,7 @@
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="自动上传">
-              <el-switch v-model="screenshotConfig.auto_upload" :disabled="!isEditing"></el-switch>
+              <el-switch v-model="screenshotConfig.auto_upload" disabled></el-switch>
             </el-form-item>
           </el-col>
 

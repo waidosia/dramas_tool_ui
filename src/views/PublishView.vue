@@ -49,7 +49,7 @@
                 />
               </el-form-item>
                <el-form-item label="片源" style="flex: 1;">
-                <el-select v-model="form.film_source" placeholder="选择片源">
+                <el-select v-model="form.filmSource" placeholder="选择片源">
                   <el-option label="WEB-DL" value="WEB-DL"></el-option>
                 </el-select>
               </el-form-item>
@@ -62,7 +62,7 @@
               </el-form-item>
 
               <el-form-item label="小组" style="flex: 1;">
-                <el-select v-model="form.group" placeholder="选择小组">
+                <el-select v-model="form.team" placeholder="选择小组">
                   <el-option label="GodDramas" value="GodDramas"></el-option>
                 </el-select>
               </el-form-item>
@@ -146,17 +146,20 @@
 
       <!-- 操作按钮展示 -->
       <el-row :gutter="20" class="buttons-row mt-20">
-        <el-col :span="6">
-          <el-button block type="primary" @click="reName">1. 重命名文件夹生成</el-button>
+        <el-col :span="5">
+          <el-button block type="primary" @click="reName">1. 重命名文件与文件夹</el-button>
         </el-col>
-        <el-col :span="6">
-          <el-button block type="primary">2. 生成命名种子</el-button>
+        <el-col :span="5">
+          <el-button block type="primary" @click="">2. 制作种子</el-button>
         </el-col>
-        <el-col :span="6">
-          <el-button block type="primary">3. 截图种子</el-button>
+        <el-col :span="5">
+          <el-button block type="primary">3. 截图并上传图床</el-button>
         </el-col>
-        <el-col :span="6">
-          <el-button block type="primary">4. 实现MediaInfo生成</el-button>
+        <el-col :span="5">
+          <el-button block type="primary">4. MediaInfo信息生成</el-button>
+        </el-col>
+         <el-col :span="4">
+          <el-button block type="primary">5. 完成发种配置并保存</el-button>
         </el-col>
       </el-row>
     </el-form>
@@ -186,11 +189,11 @@ export default {
         // 发布当前季
         season: 0,
         // 片源
-        film_source:'',
+        filmSource:'',
         // 短剧来源
         source: '',
         // 发布小组
-        group: '',
+        team: '',
         // 封面图
         cover: '',
         // 豆瓣链接
@@ -226,7 +229,7 @@ export default {
         // 截图标
         screenshotIcon:'',
         // 第一集路径
-        first_file_name: '',
+        firstFileName: '',
       },
       videoFolders: [],
       selectedFile: null,
@@ -239,9 +242,9 @@ export default {
   methods: {
     initData(){
       this.form.year = date;
-      this.form.group = "GodDramas";
+      this.form.team = "GodDramas";
       this.form.source = "网络付费短剧";
-      this.form.film_source = "WEB-DL";
+      this.form.filmSource = "WEB-DL";
       this.form.reference = "[quote][size=4]因组内调整，之后新发布，均禁止[color=Red]转载 [color=Black]谢谢！！[/size][/quote]"
       this.form.groupIcon = "https://img.pterclub.com/images/2024/01/10/GodDramas-.png"
       this.form.videoInfoIcon = "https://img.pterclub.com/images/2024/01/10/49401952f8353abd4246023bff8de2cc.png"
@@ -279,7 +282,7 @@ export default {
               // 更新封面图
               this.form.cover = response.data.data.poster;
               // 中文名
-              this.form.cnName = response.data.data.chinese_title;
+              this.form.cnName = response.data.data.cnName;
               // 英文名
               this.convertToPinyin()
               // 年份
@@ -287,7 +290,7 @@ export default {
               // 简介
               this.form.introduction = response.data.data.introduction;
               //类型
-              this.form.category = response.data.data.genre;
+              this.form.category = response.data.data.category;
               // 发布信息
               this.form.publishInfo = response.data.data.format;
               this.$message.success("获取豆瓣信息成功");
@@ -355,19 +358,19 @@ export default {
                 season : this.form.season,
                 category: this.form.category,
                 source : this.form.source,
-                film_source : this.form.film_source,
-                group : this.form.group,
+                filmSource : this.form.filmSource,
+                team : this.form.team,
               })
           .then((response) => {
              console.log(response)
             if (response.data.code === 200) {
-              this.form.mainTitle = response.data.data.main_title;
+              this.form.mainTitle = response.data.data.mainTitle;
               this.form.first_file_name = response.data.data.first_file_name;
-              this.form.subTitle = response.data.data.second_title;
+              this.form.subTitle = response.data.data.subTitle;
               this.fetchVideoFolders()
-               const match = this.videoFolders.find(folder => folder.path === response.data.data.new_folder_path);
+               const match = this.videoFolders.find(folder => folder.path === response.data.data.newFolderPath);
               if (match) {
-                this.form.videoFolder = response.data.data.new_folder_path;
+                this.form.videoFolder = response.data.data.newFolderPath;
               } else if (this.videoFolders.length) {
                 // 如果未找到指定路径，则选择第一个文件夹
                 this.form.videoFolder = this.videoFolders[0].path;
@@ -382,7 +385,9 @@ export default {
             this.$message.error("在线链接上传失败");
           });
     },
+    makeTorrent(){
 
+    },
     // 判断输入框内容是否为在线图片链接
     isOnlineImageUrl(url) {
       return url.startsWith("http://") || url.startsWith("https://");
