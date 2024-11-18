@@ -2,102 +2,107 @@
   <div class="container">
     <h2 class="title">短剧信息输入</h2>
 
-    <el-form :model="form" label-width="120px">
+    <el-form :model="form" label-width="90px">
       <!-- 左侧信息区 -->
-      <el-row :gutter="20">
+      <el-row :gutter="5">
         <el-col :span="12">
-          <el-card class="card" shadow="hover">
-            <div slot="header" class="card-header">信息输入区</div>
+         <el-card class="card" shadow="hover">
+    <div slot="header" class="card-header">信息输入区</div>
 
-            <el-form-item label="视频文件夹">
-              <el-select v-model="form.videoFolder" filterable placeholder="请选择视频所属文件夹" @click="fetchVideoFolders">
-                <el-option v-for="videoFolder in videoFolders" :key="videoFolder.name" :label="videoFolder.name"
-                           :value="videoFolder.path"></el-option>
-              </el-select>
-            </el-form-item>
-             <el-form-item label="豆瓣地址" style="display: flex; flex-wrap: wrap;">
-              <el-input v-model="form.ptGen" placeholder="根据豆瓣地址，动态获取信息" style="flex: 1;"/>
-              <el-button style="flex: 0;" @click="submitPtGen">
-                <el-icon>
-                  <Chicken/>
-                </el-icon>
-              </el-button>
-            </el-form-item>
-            <div style="display: flex; flex-wrap: wrap;">
-              <el-form-item label="中文名">
-                <el-input v-model="form.cnName" @blur="convertToPinyin"/>
-              </el-form-item>
-              <el-form-item label="英文名">
-                <el-input v-model="form.enName" placeholder="将自动生成拼音,可自行修改"/>
-              </el-form-item>
-            </div>
-            <div style="display: flex; flex-wrap: wrap;">
-              <el-form-item label="年份" style="flex: 0;">
-                <el-date-picker
-                    v-model="form.year"
-                    placeholder="发布年份"
-                    type="year"
-                />
-              </el-form-item>
-              <el-form-item label="季数" style="flex: 0;">
-                <el-input-number
-                    v-model="form.season"
-                    :max="99"
-                    :min="1"
-                    controls-position="right"
-                    size="small"
-                />
-              </el-form-item>
-               <el-form-item label="片源" style="flex: 1;">
-                <el-select v-model="form.filmSource" placeholder="选择片源">
-                  <el-option label="WEB-DL" value="WEB-DL"></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="来源" style="flex: 1;">
-                <el-select v-model="form.source" placeholder="选择来源">
-                  <el-option label="网络付费短剧" value="网络付费短剧"></el-option>
-                  <el-option label="抖音短剧" value="抖音短剧"></el-option>
-                  <el-option label="快手短剧" value="快手短剧"></el-option>
-                </el-select>
-              </el-form-item>
+  <el-form-item label="视频文件夹">
+    <el-select v-model="form.videoFolder" filterable placeholder="请选择视频所属文件夹" @click="fetchVideoFolders">
+      <el-option v-for="videoFolder in videoFolders" :key="videoFolder.name" :label="videoFolder.name"
+                 :value="videoFolder.path"></el-option>
+    </el-select>
+  </el-form-item>
 
-              <el-form-item label="小组" style="flex: 1;">
-                <el-select v-model="form.team" placeholder="选择小组">
-                  <el-option label="GodDramas" value="GodDramas"></el-option>
-                </el-select>
-              </el-form-item>
-            </div>
+  <el-form-item label="豆瓣地址" style="display: flex; flex-wrap: wrap;">
+    <el-input v-model="form.ptGen" placeholder="根据豆瓣地址，动态获取信息" style="flex: 1;"/>
+    <el-button style="flex: 0;" @click="submitPtGen">
+      <el-icon>
+        <Chicken/>
+      </el-icon>
+    </el-button>
+  </el-form-item>
 
-            <el-form-item label="封面" style="display: flex; flex-wrap: wrap;">
-              <el-input v-model="form.cover" placeholder="输入在线图片链接或本地图片" style="flex: 1;"/>
-              <el-upload ref="upload" :show-file-list="false" :auto-upload="false" @change="handleFileChange">
-                <el-button type="primary">选择本地文件</el-button>
-              </el-upload>
-              <el-button style="flex: 0;" @click="submitCover">
-                <el-icon>
-                  <UploadFilled/>
-                </el-icon>
-              </el-button>
-            </el-form-item>
-            <el-form-item label="简介" style="display: flex; flex-wrap: wrap; ">
-              <el-input v-model="form.introduction" placeholder="简介" type="textarea" style="flex: 1;"/>
-            </el-form-item>
+  <div style="display: flex; flex-wrap: wrap;">
+    <el-form-item label="中文名" style="flex: 1;">
+      <el-input v-model="form.cnName" @blur="convertToPinyin"/>
+    </el-form-item>
+    <el-form-item label="英文名" style="flex: 1;">
+      <el-input v-model="form.enName" placeholder="将自动生成拼音,可自行修改"/>
+    </el-form-item>
+  </div>
 
+  <div style="display: flex; flex-wrap: wrap; align-items: center;">
+    <el-form-item label="年份" style="flex: 0 0 100px;">
+      <el-date-picker
+          v-model="form.year"
+          placeholder="发布年份"
+          type="year"
+      />
+    </el-form-item>
+    <el-form-item label="季数" style="flex: 0 0 120px;">
+      <el-input-number
+          v-model="form.season"
+          :max="99"
+          :min="1"
+          controls-position="right"
+          size="small"
+      />
+    </el-form-item>
+    <el-form-item label="片源" style="flex: 1; ">
+      <el-select v-model="form.filmSource" placeholder="选择片源">
+        <el-option label="WEB-DL" value="WEB-DL"></el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="来源" style="flex: 1;">
+      <el-select v-model="form.source" placeholder="选择来源">
+        <el-option label="网络付费短剧" value="网络付费短剧"></el-option>
+        <el-option label="抖音短剧" value="抖音短剧"></el-option>
+        <el-option label="快手短剧" value="快手短剧"></el-option>
+      </el-select>
+    </el-form-item>
+  </div>
 
+  <div style="display: flex; flex-wrap: wrap;">
+    <el-form-item label="小组" style="flex: 1;">
+      <el-select v-model="form.team" placeholder="选择小组">
+        <el-option label="GodDramas" value="GodDramas"></el-option>
+      </el-select>
+    </el-form-item>
+  </div>
 
-            <el-form-item label="分类">
-              <el-checkbox-group v-model="form.category">
-                <el-checkbox label="剧情" value="剧情"/>
-                <el-checkbox label="爱情" value="爱情"/>
-                <el-checkbox label="穿越" value="穿越"/>
-                <el-checkbox label="重生" value="重生"/>
-                <el-checkbox label="逆袭" value="逆袭"/>
-                <el-checkbox label="都市" value="都市"/>
-                <el-checkbox label="喜剧" value="喜剧"/>
-                <el-checkbox label="科幻" value="科幻"/>
-              </el-checkbox-group>
-            </el-form-item>
-          </el-card>
+  <el-form-item label="封面" style="display: flex; flex-wrap: wrap;">
+    <el-input v-model="form.cover" placeholder="输入在线图片链接或选择本地图片" style="flex: 1;"/>
+    <el-upload ref="upload" :show-file-list="false" :auto-upload="false" @change="handleFileChange">
+      <el-button type="primary">选择本地文件</el-button>
+    </el-upload>
+    <el-button style="flex: 0;" @click="submitCover">
+      <el-icon>
+        <UploadFilled/>
+      </el-icon>
+    </el-button>
+  </el-form-item>
+
+  <el-form-item label="简介" style="display: flex; flex-wrap: wrap;">
+    <el-input v-model="form.introduction" placeholder="简介" type="textarea" style="flex: 1;"/>
+  </el-form-item>
+
+  <el-form-item label="分类">
+    <el-checkbox-group v-model="form.category">
+      <el-checkbox label="剧情" value="剧情"/>
+      <el-checkbox label="爱情" value="爱情"/>
+      <el-checkbox label="穿越" value="穿越"/>
+      <el-checkbox label="重生" value="重生"/>
+      <el-checkbox label="逆袭" value="逆袭"/>
+      <el-checkbox label="都市" value="都市"/>
+      <el-checkbox label="喜剧" value="喜剧"/>
+      <el-checkbox label="科幻" value="科幻"/>
+    </el-checkbox-group>
+  </el-form-item>
+</el-card>
+
         </el-col>
 
         <!-- 右侧调试与信息区 -->
@@ -125,7 +130,7 @@
       <!-- 命名信息 -->
       <el-card class="card mt-20" shadow="hover">
         <div slot="header" class="card-header">命名信息</div>
-        <el-row :gutter="20">
+        <el-row >
           <el-col :span="12">
             <el-form-item label="主标题">
               <el-input v-model="form.mainTitle"/>
@@ -137,29 +142,36 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="种子路径">
-              <el-input v-model="form.torrentPath" placeholder="输入种子路径"/>
+            <el-form-item label="种子路径" >
+              <el-input v-model="form.torrentPath" placeholder="种子路径" disabled  style="flex: 1;"/>
+              <el-button @click="TorrentDownload" style="flex: 0;">下载</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-card>
 
       <!-- 操作按钮展示 -->
-      <el-row :gutter="20" class="buttons-row mt-20">
-        <el-col :span="5">
-          <el-button block type="primary" @click="reName">1. 重命名文件与文件夹</el-button>
-        </el-col>
-        <el-col :span="5">
-          <el-button block type="primary" @click="">2. 制作种子</el-button>
-        </el-col>
-        <el-col :span="5">
-          <el-button block type="primary">3. 截图并上传图床</el-button>
-        </el-col>
-        <el-col :span="5">
-          <el-button block type="primary">4. MediaInfo信息生成</el-button>
-        </el-col>
-         <el-col :span="4">
-          <el-button block type="primary">5. 完成发种配置并保存</el-button>
+<!--      <el-row :gutter="20" class="buttons-row mt-20">-->
+<!--        <el-col :span="5">-->
+<!--          <el-button block type="primary" @click="reName">1. 重命名文件与文件夹</el-button>-->
+<!--        </el-col>-->
+<!--        <el-col :span="5">-->
+<!--          <el-button block type="primary" @click="makeTorrent">2. 制作种子</el-button>-->
+<!--        </el-col>-->
+<!--        <el-col :span="5">-->
+<!--          <el-button block type="primary">3. 截图并上传图床</el-button>-->
+<!--        </el-col>-->
+<!--        <el-col :span="5">-->
+<!--          <el-button block type="primary">4. MediaInfo信息生成</el-button>-->
+<!--        </el-col>-->
+<!--         <el-col :span="4">-->
+<!--          <el-button block type="primary">5. 完成发种配置并保存</el-button>-->
+<!--        </el-col>-->
+<!--      </el-row>-->
+
+      <el-row>
+         <el-col >
+          <el-button type="primary" @click="Start">一键启动</el-button>
         </el-col>
       </el-row>
     </el-form>
@@ -178,6 +190,8 @@ export default {
   data() {
     return {
       form: {
+        //ID
+        id: null,
         // 视频文件夹
         videoFolder: null,
         // 中文名
@@ -347,47 +361,111 @@ export default {
         this.$message.warning("请输入有效的链接或选择一个文件");
       }
     },
-    reName(){
-       axios
-          .post("http://127.0.0.1:5000/api/rename",
-              {
-                videoFolder: this.form.videoFolder,
-                cnName: this.form.cnName,
-                enName: this.form.enName,
-                year: this.form.year.getFullYear(),
-                season : this.form.season,
-                category: this.form.category,
-                source : this.form.source,
-                filmSource : this.form.filmSource,
-                team : this.form.team,
-              })
-          .then((response) => {
-             console.log(response)
-            if (response.data.code === 200) {
-              this.form.mainTitle = response.data.data.mainTitle;
-              this.form.first_file_name = response.data.data.first_file_name;
-              this.form.subTitle = response.data.data.subTitle;
-              this.fetchVideoFolders()
-               const match = this.videoFolders.find(folder => folder.path === response.data.data.newFolderPath);
-              if (match) {
-                this.form.videoFolder = response.data.data.newFolderPath;
-              } else if (this.videoFolders.length) {
-                // 如果未找到指定路径，则选择第一个文件夹
-                this.form.videoFolder = this.videoFolders[0].path;
-              }
-              this.$message.success("获取标准命名成功");
-            } else{
-              this.$message.error(response.data.message);
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            this.$message.error("在线链接上传失败");
-          });
+    // reName(){
+    //    axios
+    //       .post("http://127.0.0.1:5000/api/rename",
+    //           {
+    //             videoFolder: this.form.videoFolder,
+    //             cnName: this.form.cnName,
+    //             enName: this.form.enName,
+    //             year: this.form.year.getFullYear(),
+    //             season : this.form.season,
+    //             category: this.form.category,
+    //             source : this.form.source,
+    //             filmSource : this.form.filmSource,
+    //             team : this.form.team,
+    //           })
+    //       .then((response) => {
+    //          console.log(response)
+    //         if (response.data.code === 200) {
+    //           this.form.mainTitle = response.data.data.mainTitle;
+    //           this.form.first_file_name = response.data.data.first_file_name;
+    //           this.form.subTitle = response.data.data.subTitle;
+    //           this.fetchVideoFolders()
+    //            const match = this.videoFolders.find(folder => folder.path === response.data.data.newFolderPath);
+    //           if (match) {
+    //             this.form.videoFolder = response.data.data.newFolderPath;
+    //           } else if (this.videoFolders.length) {
+    //             // 如果未找到指定路径，则选择第一个文件夹
+    //             this.form.videoFolder = this.videoFolders[0].path;
+    //           }
+    //           this.$message.success("获取标准命名成功");
+    //         } else{
+    //           this.$message.error(response.data.message);
+    //         }
+    //       })
+    //       .catch((error) => {
+    //         console.error(error);
+    //         this.$message.error("在线链接上传失败");
+    //       });
+    // },
+    // makeTorrent(){
+    //   // 制作种子的逻辑
+    //   if (this.form.torrentPath !== "" ){
+    //     this.$confirm("已存在种子，确认重新制作？","提示",{
+    //       confirmButtonText:'确定',
+    //       cancelButtonText: '取消',
+    //       type: 'warnimg'
+    //     }).then((status) => {
+    //       if (status==="confirm") {
+    //         // 做种
+    //         this.form.torrentPath = "";
+    //         this.Torrent();
+    //       }
+    //     })
+    //   } else {
+    //     this.Torrent();
+    //   }
+    // },
+    // Torrent() {
+    //   if (this.form.videoFolder === null || this.form.videoFolder === undefined) {
+    //     this.$message.warning("请先选择视频文件夹")
+    //   } else {
+    //     axios
+    //         .post(
+    //             "http://127.0.0.1:5000/api/torrent",
+    //             {
+    //               videoFolder: this.form.videoFolder,
+    //             }).then(response => {
+    //       if (response.data.code === 200) {
+    //         this.form.torrentPath = response.data.data;
+    //         this.$message.success("制作种子成功");
+    //       } else {
+    //         this.$message.error(response.data.message);
+    //       }
+    //     })
+    //         .catch((error) => {
+    //           console.error(error);
+    //           this.$message.error("制作种子失败");
+    //         })
+    //   }
+    // },
+    TorrentDownload(){
+      if (this.form.torrentPath !== ""){
+        this.Download(this.form.torrentPath);
+      }
     },
-    makeTorrent(){
+    Download(path){
+      // 通用的下载组件
+      window.open("http://127.0.0.1:5000/api/download/" + "?path=" + path, "_blank");
+    },
+    // 一键启动
+    Start(){
+      axios.post("http://127.0.0.1:5000/api/publish",
+          this.form,
+          ).then((response) => {
+            console.log(response)
+        if (response.data.code === 200) {
+          this.$message.info("发种信息已准备完成")
+        } else{
+          this.$message.error(response.data.message);
+        }
+      }).catch(error => {
+        console.error(error);
+        this.$message.error("其他错误")
+      })
+    },
 
-    },
     // 判断输入框内容是否为在线图片链接
     isOnlineImageUrl(url) {
       return url.startsWith("http://") || url.startsWith("https://");
@@ -418,11 +496,4 @@ export default {
   font-weight: bold;
 }
 
-.mt-20 {
-  margin-top: 20px;
-}
-
-.buttons-row {
-  margin-top: 20px;
-}
 </style>

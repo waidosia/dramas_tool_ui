@@ -40,6 +40,9 @@
         <el-form-item label="是否启用">
           <el-switch v-model="editForm.is_available"></el-switch>
         </el-form-item>
+         <el-form-item label="是否使用代理">
+          <el-switch v-model="editForm.is_proxy"></el-switch>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">关闭</el-button>
@@ -50,8 +53,8 @@
 </template>
 
 <script>
-import axios from 'axios';
 import {ElMessage} from "element-plus";
+import {_get, _put} from "@/Service.js";
 
 export default {
   name: 'ImgHostConfigView',
@@ -70,28 +73,24 @@ export default {
     };
   },
   created() {
-    this.fetchImgHosts(); // 组件创建时，获取图床信息
+    this.fetchImgHosts();
+    this.$emit('dataFetched', this.imgHostList); // 通知父组件
   },
   methods: {
     fetchData() {
       this.fetchImgHosts();
     },
     // 获取图床信息
-    fetchImgHosts() {
-      axios.get('http://127.0.0.1:5000/api/img')
-          .then(response => {
-            if (response.data.code === 200) {
-              this.imgHostList = response.data.data;
-            } else {
-              ElMessage.error('获取图床信息失败');
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('获取图床信息失败');
-          });
+    async fetchImgHosts() {
+      const res = await _get('/api/img')
+      if (res){
+        if (res.code === 200) {
+          this.imgHostList = res.data
+        } else {
+         ElMessage.error('获取图床列表失败');
+        }
+      }
     },
-
     // 打开编辑弹窗
     editImgHost(imgHost) {
       this.editForm = {...imgHost};
@@ -99,26 +98,18 @@ export default {
     },
 
     // 保存修改后的图床信息
-    saveImgHost() {
-      axios.put(`http://127.0.0.1:5000/api/img/${this.editForm.id}`, {
-        name: this.editForm.name,
-        url: this.editForm.url,
-        key_or_cookie: this.editForm.key_or_cookie,
-        is_available: this.editForm.is_available,
-      })
-          .then(response => {
-            if (response.data.code === 200) {
-              ElMessage.success('编辑成功');
-              this.dialogVisible = false; // 关闭弹窗
-              this.fetchImgHosts(); // 刷新列表
-            } else {
-              ElMessage.error('编辑失败');
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('编辑失败');
-          });
+    async saveImgHost() {
+      const res = await _put(`/api/img/${this.editForm.id}`, {},this.editForm);
+      if (res) {
+        if (res.code === 200) {
+          ElMessage.success('编辑成功');
+          this.dialogVisible = false; // 关闭弹窗
+          await this.fetchImgHosts(); // 刷新列表
+        } else {
+          ElMessage.error('编辑失败');
+          this.dialogVisible = false; // 关闭弹窗
+        }
+      }
     }
   }
 };

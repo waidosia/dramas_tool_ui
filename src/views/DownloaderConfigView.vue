@@ -58,8 +58,8 @@
 </template>
 
 <script>
-import {ElMessage} from 'element-plus';
-import axios from 'axios';
+import {_del, _get, _post, _put} from "@/Service.js";
+import {ElMessage} from "element-plus";
 
 export default {
   name: 'DownloaderConfigView',
@@ -82,16 +82,18 @@ export default {
   methods: {
     fetchData() {
       this.fetchDownloader();
+      this.$emit('dataFetched', this.downloader); // 通知父组件
     },
     // 查询所有下载器配置
-    fetchDownloader() {
-      axios.get('http://127.0.0.1:5000/api/downloader')
-          .then(response => {
-            this.downloader = response.data.data;
-          })
-          .catch(error => {
-            console.error(error);
-          });
+    async fetchDownloader() {
+     const res = await _get('/api/downloader')
+      if (res){
+        if (res.code === 200) {
+          this.downloader = res.data;
+        } else {
+          ElMessage.error("获取下载器列表失败");
+        }
+      }
     },
     // 打开新增下载器的对话框
     openAddDialog() {
@@ -106,44 +108,48 @@ export default {
       this.dialogVisible = true;
     },
     // 提交表单
-    submitForm() {
+    async submitForm() {
       if (this.isEdit) {
-        // 编辑模式，发送PUT请求
-        axios.put(`http://127.0.0.1:5000/api/downloader/${this.form.id}`, this.form)
-            .then(() => {
-              ElMessage.success('编辑成功');
-              this.fetchDownloader();
-              this.dialogVisible = false;
-            })
-            .catch(error => {
-              console.error(error);
-              ElMessage.error('编辑失败');
-            });
+        // 编辑
+        const res = await _put(`/api/downloader/${this.form.id}`, {},this.form);
+        if (res) {
+          if (res.code === 200) {
+            ElMessage.success("编辑成功")
+            await this.fetchDownloader();
+            this.dialogVisible = false;
+          } else {
+            ElMessage.error("编辑失败");
+            this.dialogVisible = false;
+          }
+        }
       } else {
-        // 新增模式，发送POST请求
-        axios.post('http://127.0.0.1:5000/api/info/downloader', this.form)
-            .then(() => {
-              ElMessage.success('新增成功');
-              this.fetchDownloader();
-              this.dialogVisible = false;
-            })
-            .catch(error => {
-              console.error(error);
-              ElMessage.error('新增失败');
-            });
+        // 新增
+        const res = await _post(`/api/downloader`, {},this.form);
+        if (res) {
+          if (res.code === 200) {
+            ElMessage.success("新增成功")
+            await this.fetchDownloader();
+            this.dialogVisible = false;
+          } else {
+            ElMessage.error("新增失败");
+            await this.fetchDownloader();
+            this.dialogVisible = false;
+          }
+        }
       }
     },
     // 删除下载器配置
-    deleteDownloader(id) {
-      axios.delete(`http://127.0.0.1:5000/api/downloader/${id}`)
-          .then(() => {
-            ElMessage.success('删除成功');
-            this.fetchDownloader();
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('删除失败');
-          });
+    async deleteDownloader(id) {
+      const res = await _del(`/api/downloader/${id}`);
+      if (res) {
+        if (res.code === 200) {
+          ElMessage.success("删除成功")
+          await this.fetchDownloader();
+        } else {
+          ElMessage.error("删除失败");
+        }
+      }
+
     },
     formatType(type) {
       // 这里将1转化为QB，2转化为TR

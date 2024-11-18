@@ -2,22 +2,22 @@
   <div>
     <el-tabs v-model="activeTab">
       <el-tab-pane label="图床配置" name="img_host">
-        <ImgHostConfigView ref="imgHostConfig"/>
+        <ImgHostConfigView ref="imgHostConfig"  @dataFetched="handleDataFetched"/>
       </el-tab-pane>
       <el-tab-pane label="PTGEN配置" name="ptgen">
-        <PtGenConfigView ref="ptgenConfig"/>
+        <PtGenConfigView ref="ptgenConfig"  @dataFetched="handleDataFetched"/>
       </el-tab-pane>
       <el-tab-pane label="下载器配置" name="downloader">
-        <DownloaderConfigView ref="downloaderConfig"/>
+        <DownloaderConfigView ref="downloaderConfig" @dataFetched="handleDataFetched"/>
       </el-tab-pane>
       <el-tab-pane label="截图配置" name="screenshot">
-        <ScreenshotConfigView ref="screenshotConfig"/>
+        <ScreenshotConfigView ref="screenshotConfig"  @dataFetched="handleDataFetched"/>
       </el-tab-pane>
       <el-tab-pane label="发布配置" name="publish">
-        <PublishConfigView ref="publishConfig"/>
+        <PublishConfigView ref="publishConfig"  @dataFetched="handleDataFetched"/>
       </el-tab-pane>
       <el-tab-pane label="站点配置" name="site">
-        <SiteConfigView ref="siteConfig"/>
+        <SiteConfigView ref="siteConfig"  @dataFetched="handleDataFetched"/>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -44,6 +44,11 @@ export default {
     return {
       activeTab: 'img_host', // 默认显示图床配置
     };
+  },
+  methods: {
+      handleDataFetched(data) {
+      console.log('data fetched:', data);
+    },
   },
   watch: {
     activeTab(newTab) {
