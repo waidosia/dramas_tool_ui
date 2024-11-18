@@ -56,8 +56,8 @@
 </template>
 
 <script>
-import axios from 'axios';
 import {ElMessage} from "element-plus";
+import {_get, _put} from "@/Service.js";
 
 export default {
   data() {
@@ -86,10 +86,11 @@ export default {
   },
   methods: {
     fetchData() {
-      this.fetchSettings();
       this.fetchDownloaders();
       this.fetchImageHosts();
       this.fetchPtGens();
+      this.fetchSettings();
+      this.$emit('dataFetched', this.settings); // 通知父组件
     },
     toggleEdit() {
       if (this.isEditing) {
@@ -97,74 +98,40 @@ export default {
       }
       this.isEditing = !this.isEditing;
     },
-    fetchSettings() {
-      axios.get('http://127.0.0.1:5000/api/info/')
-          .then(response => {
-            if (response.data.code === 200) {
-              this.settings = response.data.data;
-            } else {
-              ElMessage.error('获取设置失败');
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('请求失败');
-          });
+    async fetchSettings() {
+      const res = await _get("/api/info");
+      console.log(res);
+      if (res && res.code === 200) {
+        this.settings = res.data;
+      } else {
+        ElMessage.error("获取发布配置失败")
+      }
     },
-    fetchDownloaders() {
-      axios.get('http://127.0.0.1:5000/api/downloader')
-          .then(response => {
-            if (response.data.code === 200) {
-              this.downloaders = response.data.data;
-            } else {
-              ElMessage.error('获取下载器列表失败');
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('请求失败');
-          });
+    async fetchDownloaders() {
+      const res = await _get("/api/downloader");
+      if (res && res.code === 200) {
+        this.downloaders = res.data;
+      }
     },
-    fetchImageHosts() {
-      axios.get('http://127.0.0.1:5000/api/img?is_available=true')
-          .then(response => {
-            if (response.data.code === 200) {
-              this.imageHosts = response.data.data;
-            } else {
-              ElMessage.error('获取图床列表失败');
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('请求失败');
-          });
+    async fetchImageHosts() {
+      const res = await _get("/api/img",{is_available:true});
+      if (res && res.code === 200) {
+        this.imageHosts = res.data;
+      }
     },
-    fetchPtGens() {
-      axios.get('http://127.0.0.1:5000/api/ptgen?is_available=true')
-          .then(response => {
-            if (response.data.code === 200) {
-              this.ptGens = response.data.data;
-            } else {
-              ElMessage.error('获取PT生成器列表失败');
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('请求失败');
-          });
+    async fetchPtGens() {
+      const res = await _get("/api/ptgen",{is_available:true});
+      if (res && res.code === 200) {
+        this.ptGens = res.data;
+      }
     },
-    updateSettings() {
-      axios.put(`http://127.0.0.1:5000/api/info/1`, this.settings)
-          .then(response => {
-            if (response.data.code === 200) {
-              ElMessage.success('设置更新成功');
-            } else {
-              ElMessage.error('更新设置失败');
-            }
-          })
-          .catch(error => {
-            ElMessage.error('请求失败');
-          });
+    async updateSettings() {
+      const res = await _put("/api/info/1", {},this.settings);
+      if (res && res.code === 200) {
+        ElMessage.success("编辑成功")
+      } else {
+        ElMessage.error("编辑失败")
+      }
     }
   }
 };

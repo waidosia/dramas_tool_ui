@@ -183,6 +183,7 @@ import axios from "axios";
 import {ElMessage} from "element-plus";
 import {pinyin} from "pinyin-pro";
 import {Chicken, UploadFilled} from "@element-plus/icons-vue";
+import {_file, _get, _post} from "@/Service.js";
 
 const date = new Date();
 export default {
@@ -264,19 +265,13 @@ export default {
       this.form.videoInfoIcon = "https://img.pterclub.com/images/2024/01/10/49401952f8353abd4246023bff8de2cc.png"
       this.form.screenshotIcon = "https://img.pterclub.com/images/2024/01/10/3a3a0f41d507ffa05df76996a1ed69e7.png"
     },
-    fetchVideoFolders() {
-      axios.get('http://127.0.0.1:5000/api/info/get_path')
-          .then(response => {
-            if (response.data.code === 200) {
-              this.videoFolders = response.data.data;
-            } else {
-              ElMessage.error('获取短剧目录列表失败');
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('获取短剧目录列表失败');
-          });
+    async fetchVideoFolders() {
+      const res = await _get('/api/info/get_path');
+      if (res && res.code === 200) {
+        this.videoFolders = res.data;
+      } else {
+        ElMessage.error('获取目录列表失败');
+      }
     },
     convertToPinyin() {
       const pinyinResult = pinyin(this.form.cnName, {toneType: "none"});
@@ -287,78 +282,79 @@ export default {
       this.selectedFile = file.raw;
       this.form.cover = file.name;
     },
-    submitPtGen(){
-      axios
-          .post("http://127.0.0.1:5000/api/ptgen/send", { url: this.form.ptGen })
-          .then((response) => {
-             console.log(response)
-            if (response.data.code === 200) {
-              // 更新封面图
-              this.form.cover = response.data.data.poster;
-              // 中文名
-              this.form.cnName = response.data.data.cnName;
-              // 英文名
-              this.convertToPinyin()
-              // 年份
-              this.form.year = new Date().setFullYear(response.data.data.year);
-              // 简介
-              this.form.introduction = response.data.data.introduction;
-              //类型
-              this.form.category = response.data.data.category;
-              // 发布信息
-              this.form.publishInfo = response.data.data.format;
-              this.$message.success("获取豆瓣信息成功");
-            } else{
-              this.$message.error(response.data.message);
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            this.$message.error("在线链接上传失败");
-          });
+    async submitPtGen(){
+      // axios
+      //     .post("http://127.0.0.1:5000/api/ptgen/send", { url: this.form.ptGen })
+      //     .then((response) => {
+      //        console.log(response)
+      //       if (response.data.code === 200) {
+      //         // 更新封面图
+      //         this.form.cover = response.data.data.poster;
+      //         // 中文名
+      //         this.form.cnName = response.data.data.cnName;
+      //         // 英文名
+      //         this.convertToPinyin()
+      //         // 年份
+      //         this.form.year = new Date().setFullYear(response.data.data.year);
+      //         // 简介
+      //         this.form.introduction = response.data.data.introduction;
+      //         //类型
+      //         this.form.category = response.data.data.category;
+      //         // 发布信息
+      //         this.form.publishInfo = response.data.data.format;
+      //         this.$message.success("获取豆瓣信息成功");
+      //       } else{
+      //         this.$message.error(response.data.message);
+      //       }
+      //     })
+      //     .catch((error) => {
+      //       console.error(error);
+      //       this.$message.error("在线链接上传失败");
+      //     });
+      const res = await _post('/api/ptgen/send',{},{ url: this.form.ptGen });
+      if (res && res.code === 200) {
+        // 更新封面图
+        this.form.cover = res.data.poster;
+        // 中文名
+        this.form.cnName = res.data.cnName;
+        // 英文名
+        this.convertToPinyin()
+        // 年份
+        this.form.year = new Date().setFullYear(res.data.year);
+        // 简介
+        this.form.introduction = res.data.introduction;
+        //类型
+        this.form.category = res.data.category;
+        // 发布信息
+        this.form.publishInfo = res.data.format;
+        ElMessage.success("获取豆瓣信息成功");
+      } else{
+        ElMessage.error("获取豆瓣信息出错")
+      }
     },
-    submitCover() {
+    async submitCover() {
       if (this.isOnlineImageUrl(this.form.cover)) {
         // 如果是在线链接
-        axios
-          .post("http://127.0.0.1:5000/api/upload/link", { url: this.form.cover })
-          .then((response) => {
-             console.log(response)
-            if (response.data.code === 200) {
-              this.form.cover = response.data.data; // 更新输入框内容为上传后的URL
-              this.$message.success("在线图片链接上传成功");
-            } else{
-              this.$message.error(response.data.message);
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            this.$message.error("在线链接上传失败");
-          });
+        const res = await _post('/api/upload/link',{},{ url: this.form.cover });
+        if (res && res.code === 200) {
+          this.form.cover = res.data; // 更新输入框内容为上传后的URL
+          ElMessage.success("在线图片链接上传成功");
+        } else {
+          ElMessage.error("在线图片链接上传失败")
+        }
       } else if (this.selectedFile) {
         // 如果是本地文件，上传文件流
         const formData = new FormData();
         formData.append("file", this.selectedFile);
-
-        axios
-          .post("http://127.0.0.1:5000/api/upload", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          })
-          .then((response) => {
-            console.log(response)
-            if (response.data.code === 200) {
-              this.form.cover = response.data.data; // 更新输入框内容为上传后的URL
-              this.$message.success("本地图片上传成功");
-            } else{
-              this.$message.error(response.data.message);
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            this.$message.error("本地文件上传失败");
-          });
+        const res = await _file('/api/upload',this.selectedFile,{}, {});
+        if (res && res.code === 200) {
+          this.form.cover = res.data; // 更新输入框内容为上传后的URL
+          ElMessage.success("本地图片上传成功");
+        } else {
+          ElMessage.error("本地图片上传失败")
+        }
       } else {
-        this.$message.warning("请输入有效的链接或选择一个文件");
+        ElMessage.warning("请输入有效的链接或选择一个文件");
       }
     },
     // reName(){
@@ -450,20 +446,26 @@ export default {
       window.open("http://127.0.0.1:5000/api/download/" + "?path=" + path, "_blank");
     },
     // 一键启动
-    Start(){
-      axios.post("http://127.0.0.1:5000/api/publish",
-          this.form,
-          ).then((response) => {
-            console.log(response)
-        if (response.data.code === 200) {
-          this.$message.info("发种信息已准备完成")
-        } else{
-          this.$message.error(response.data.message);
-        }
-      }).catch(error => {
-        console.error(error);
-        this.$message.error("其他错误")
-      })
+    async Start(){
+      // axios.post("http://127.0.0.1:5000/api/publish",
+      //     this.form,
+      //     ).then((response) => {
+      //       console.log(response)
+      //   if (response.data.code === 200) {
+      //     this.$message.info("发种信息已准备完成")
+      //   } else{
+      //     this.$message.error(response.data.message);
+      //   }
+      // }).catch(error => {
+      //   console.error(error);
+      //   this.$message.error("其他错误")
+      // })
+      const res = await _post('/api/publish');
+      if (res && res.code === 200) {
+        ElMessage.success("发种信息已准备完成")
+      } else {
+        ElMessage.error("不明生物来袭")
+      }
     },
 
     // 判断输入框内容是否为在线图片链接

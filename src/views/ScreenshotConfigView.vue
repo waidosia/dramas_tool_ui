@@ -94,6 +94,7 @@
 <script>
 import axios from 'axios';
 import {ElMessage} from "element-plus";
+import {_get, _put} from "@/Service.js";
 
 export default {
   name: "ScreenshotConfigView",
@@ -121,44 +122,34 @@ export default {
   methods: {
     fetchData() {
       this.fetchScreenshotConfig();
+      this.$emit('dataFetched', this.screenshotConfig); // 通知父组件
     },
     // 切换编辑和保存状态
     toggleEdit() {
       if (this.isEditing) {
-        this.updateScreenshotConfig();  // 如果当前是编辑状态，点击时保存数据
+        this.updateScreenshotConfig();
       }
       this.isEditing = !this.isEditing;
     },
     // 获取截图配置
-    fetchScreenshotConfig() {
-      axios.get('http://127.0.0.1:5000/api/screenshot')
-          .then(response => {
-            if (response.data.code === 200) {
-              this.screenshotConfig = response.data.data[0];
-            } else {
-              ElMessage.error('获取截图配置失败');
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('请求失败');
-          });
+    async fetchScreenshotConfig() {
+      const res = await _get('/api/screenshot');
+      if (res && res.code === 200) {
+        console.log(res);
+        this.screenshotConfig = res.data[0];
+      } else {
+        ElMessage.error("获取截图配置失败")
+      }
     },
     // 更新截图配置
-    updateScreenshotConfig() {
-      axios.put(`http://127.0.0.1:5000/api/screenshot/${this.screenshotConfig.id}`, this.screenshotConfig)
-          .then(response => {
-            if (response.data.code === 200) {
-              ElMessage.success('更新成功');
-              this.fetchScreenshotConfig();
-            } else {
-              ElMessage.error('更新失败');
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('更新失败');
-          });
+    async updateScreenshotConfig() {
+      const res = await _put(`/api/screenshot/${this.screenshotConfig.id}`,{},this.screenshotConfig);
+      if (res && res.code === 200) {
+        ElMessage.success('编辑成功');
+        await this.fetchScreenshotConfig();
+      } else {
+        ElMessage.error('编辑失败');
+      }
     }
   }
 };

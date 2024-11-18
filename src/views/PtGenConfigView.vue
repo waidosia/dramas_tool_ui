@@ -50,8 +50,8 @@
 </template>
 
 <script>
-import axios from "axios";
 import {ElMessage} from "element-plus";
+import {_del, _get, _post, _put} from "@/Service.js";
 
 export default {
   name: 'PtGenConfigView',
@@ -74,19 +74,19 @@ export default {
   methods: {
     fetchData() {
       this.fetchPtgenList();
+      this.$emit('dataFetched', this.ptgenList); // 通知父组件
     },
-    fetchPtgenList() {
-      // 获取 PTGEN 列表
-      fetch('http://127.0.0.1:5000/api/ptgen')
-          .then(response => response.json())
-          .then(data => {
-            if (data.code === 200) {
-              this.ptgenList = data.data;
-            }
-          });
+    async fetchPtgenList() {
+      const res = await _get("/api/ptgen");
+      if (res){
+        if (res.code === 200){
+          this.ptgenList = res.data
+        } else {
+          ElMessage.error("获取PTGEN列表失败");
+        }
+      }
     },
     openNewDialog() {
-      // 打开新增 PTGEN 的弹窗
       this.form = {
         id: null,
         name: '',
@@ -97,49 +97,45 @@ export default {
       this.isEdit = false;
     },
     openEditDialog(row) {
-      // 打开编辑 PTGEN 的弹窗
       this.form = {...row}; // 将行数据复制到表单
       this.dialogVisible = true;
       this.isEdit = true;
     },
-    submitForm() {
+
+    async submitForm() {
       if (this.isEdit) {
-        // 编辑模式，发送PUT请求
-        axios.put(`http://127.0.0.1:5000/api/ptgen/${this.form.id}`, this.form)
-            .then(() => {
-              ElMessage.success('编辑成功');
-              this.fetchPtgenList();
-              this.dialogVisible = false;
-            })
-            .catch(error => {
-              console.error(error);
-              ElMessage.error('编辑失败');
-            });
+        // 编辑
+        const res = await _put(`/api/ptgen/${this.form.id}`,{},this.form);
+        if (res && res.code === 200){
+          ElMessage.success('编辑成功');
+          await this.fetchPtgenList();
+          this.dialogVisible = false;
+        } else {
+          ElMessage.error('编辑失败');
+          this.dialogVisible = false;
+        }
       } else {
-        // 新增模式，发送POST请求
-        axios.post('http://127.0.0.1:5000/api/info/ptgen', this.form)
-            .then(() => {
-              ElMessage.success('新增成功');
-              this.fetchPtgenList();
-              this.dialogVisible = false;
-            })
-            .catch(error => {
-              console.error(error);
-              ElMessage.error('新增失败');
-            });
+        // 新增
+        const res = await _post(`/api/ptgen`,{},this.form);
+        if (res && res.code === 200){
+          ElMessage.success('新增成功');
+          await this.fetchPtgenList();
+          this.dialogVisible = false;
+        } else {
+          ElMessage.error('新增失败');
+          this.dialogVisible = false;
+        }
       }
     },
 
-    deletePtgen(id) {
-      axios.delete(`http://127.0.0.1:5000/api/ptgen/${id}`)
-          .then(() => {
-            ElMessage.success('删除成功');
-            this.fetchPtgenList();
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('删除失败');
-          });
+    async deletePtgen(id) {
+      const res = await _del(`/api/ptgen/${id}`);
+      if (res && res.code === 200){
+        ElMessage.success('删除成功');
+        await this.fetchPtgenList();
+      } else {
+        ElMessage.error('删除失败');
+      }
     }
   }
 };

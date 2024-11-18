@@ -64,6 +64,7 @@
 <script>
 import {ElMessage} from "element-plus";
 import axios from "axios";
+import {_del, _get, _post, _put} from "@/Service.js";
 
 export default {
   name: 'SiteConfigView',
@@ -87,16 +88,16 @@ export default {
   methods: {
     fetchData() {
       this.fetchSiteList();
+      this.$emit('dataFetched', this.ptgenList); // 通知父组件
     },
-    fetchSiteList() {
+    async fetchSiteList() {
       // 获取站点配置列表
-      fetch('http://127.0.0.1:5000/api/site')
-          .then(response => response.json())
-          .then(data => {
-            if (data.code === 200) {
-              this.siteList = data.data;
-            }
-          });
+      const res = await _get('/api/site');
+      if (res && res.code === 200) {
+        this.siteList = res.data;
+      } else {
+        ElMessage.error("获取站点列表失败");
+      }
     },
     openNewDialog() {
       // 打开新增站点的弹窗
@@ -116,43 +117,40 @@ export default {
       this.dialogVisible = true;
       this.isEdit = true;
     },
-    submitForm() {
+    async submitForm() {
       if (this.isEdit) {
-        // 编辑模式，发送PUT请求
-        axios.put(`http://127.0.0.1:5000/api/site/${this.form.id}`, this.form)
-            .then(() => {
-              ElMessage.success('编辑成功');
-              this.fetchSiteList();
-              this.dialogVisible = false;
-            })
-            .catch(error => {
-              console.error(error);
-              ElMessage.error('编辑失败');
-            });
+        // 编辑
+        const res = await _put(`/api/site/${this.form.id}`, {},this.form)
+        if (res && res.code === 200) {
+          ElMessage.success('编辑成功');
+          await this.fetchSiteList();
+          this.dialogVisible = false;
+        } else {
+          ElMessage.error('编辑失败');
+          this.dialogVisible = false;
+        }
       } else {
-        // 新增模式，发送POST请求
-        axios.post('http://127.0.0.1:5000/api/info/site', this.form)
-            .then(() => {
-              ElMessage.success('新增成功');
-              this.fetchSiteList();
-              this.dialogVisible = false;
-            })
-            .catch(error => {
-              console.error(error);
-              ElMessage.error('新增失败');
-            });
+      // 新增
+        const res = await _post(`/api/site`, {},this.form);
+        if (res && res.code === 200) {
+          ElMessage.success('新增成功');
+          await this.fetchSiteList();
+          this.dialogVisible = false;
+
+      } else {
+          ElMessage.error('新增失败');
+          this.dialogVisible = false;
+        }
       }
     },
-    deleteSite(id) {
-      axios.delete(`http://127.0.0.1:5000/api/site/${id}`)
-          .then(() => {
-            ElMessage.success('删除成功');
-            this.fetchSiteList();
-          })
-          .catch(error => {
-            console.error(error);
-            ElMessage.error('删除失败');
-          });
+    async deleteSite(id) {
+      const res = await _del(`/api/site/${id}`);
+      if (res && res.code === 200) {
+        ElMessage.success('删除成功');
+        await this.fetchSiteList();
+      } else {
+        ElMessage.error('删除失败');
+      }
     },
     formatType(type) {
       // 这里将1转化为QB，2转化为TR

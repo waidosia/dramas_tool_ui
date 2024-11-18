@@ -83,13 +83,11 @@ export default {
     // 获取图床信息
     async fetchImgHosts() {
       const res = await _get('/api/img')
-      if (res){
-        if (res.code === 200) {
+      if (res && res.code === 200) {
           this.imgHostList = res.data
         } else {
          ElMessage.error('获取图床列表失败');
         }
-      }
     },
     // 打开编辑弹窗
     editImgHost(imgHost) {
@@ -100,8 +98,7 @@ export default {
     // 保存修改后的图床信息
     async saveImgHost() {
       const res = await _put(`/api/img/${this.editForm.id}`, {},this.editForm);
-      if (res) {
-        if (res.code === 200) {
+      if (res &&res.code === 200) {
           ElMessage.success('编辑成功');
           this.dialogVisible = false; // 关闭弹窗
           await this.fetchImgHosts(); // 刷新列表
@@ -110,7 +107,6 @@ export default {
           this.dialogVisible = false; // 关闭弹窗
         }
       }
-    }
   }
 };
 </script>

@@ -87,13 +87,11 @@ export default {
     // 查询所有下载器配置
     async fetchDownloader() {
      const res = await _get('/api/downloader')
-      if (res){
-        if (res.code === 200) {
+      if (res && res.code === 200) {
           this.downloader = res.data;
         } else {
           ElMessage.error("获取下载器列表失败");
         }
-      }
     },
     // 打开新增下载器的对话框
     openAddDialog() {
@@ -112,8 +110,7 @@ export default {
       if (this.isEdit) {
         // 编辑
         const res = await _put(`/api/downloader/${this.form.id}`, {},this.form);
-        if (res) {
-          if (res.code === 200) {
+        if (res && res.code === 200) {
             ElMessage.success("编辑成功")
             await this.fetchDownloader();
             this.dialogVisible = false;
@@ -121,12 +118,11 @@ export default {
             ElMessage.error("编辑失败");
             this.dialogVisible = false;
           }
-        }
+
       } else {
         // 新增
         const res = await _post(`/api/downloader`, {},this.form);
-        if (res) {
-          if (res.code === 200) {
+        if (res && res.code === 200) {
             ElMessage.success("新增成功")
             await this.fetchDownloader();
             this.dialogVisible = false;
@@ -135,20 +131,17 @@ export default {
             await this.fetchDownloader();
             this.dialogVisible = false;
           }
-        }
       }
     },
     // 删除下载器配置
     async deleteDownloader(id) {
       const res = await _del(`/api/downloader/${id}`);
-      if (res) {
-        if (res.code === 200) {
+      if (res && res.code === 200) {
           ElMessage.success("删除成功")
           await this.fetchDownloader();
         } else {
           ElMessage.error("删除失败");
         }
-      }
 
     },
     formatType(type) {

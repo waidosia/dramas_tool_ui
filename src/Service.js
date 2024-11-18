@@ -5,7 +5,7 @@ const ConfigBaseURL = 'http://127.0.0.1:5000/'
 
 //使用create方法创建axios实例
 export const Service = axios.create({
-  timeout: 7000, // 请求超时时间
+  // timeout: 10000, // 请求超时时间
   baseURL: ConfigBaseURL,
   method: 'post',
   headers: {
@@ -48,13 +48,14 @@ export async function _get(url, qs,headers) {
 }
 
 //封装的post
-export async function _post(url, qs, body) {
+export async function _post(url, qs, body,headers) {
   const params = {
     url,
     method: 'post',
     params: isObj(qs) ? qs : {},
     data: isObj(body) ? body : {}
   }
+  if(isObj(headers)){params.headers = headers}
   const [err, res] = await to(Service(params))
   if (!err && res) {
     return res
@@ -63,14 +64,16 @@ export async function _post(url, qs, body) {
   }
 }
 
+
 //封装的put
-export async function _put(url, qs, body) {
+export async function _put(url, qs, body,headers) {
   const params = {
     url,
     method: 'put',
     params: isObj(qs) ? qs : {},
     data: isObj(body) ? body : {}
   }
+  if(isObj(headers)){params.headers = headers}
   const [err, res] = await to(Service(params))
   if (!err && res) {
     return res
@@ -93,4 +96,40 @@ export async function _del(url, qs,headers) {
   } else {
     return console.log(err)
   }
+}
+
+// 上传文件封装（支持multipart/form-data）
+export async function _file(url, file, formData = {}, headers = {}) {
+  const params = {
+    url,
+    method: 'post',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      ...headers
+    },
+    data: formData
+  };
+
+  // 将文件附加到 FormData 中
+  const form = new FormData();
+  form.append('file', file);
+  Object.entries(formData).forEach(([key, value]) => {
+    form.append(key, value);
+  });
+
+  params.data = form;  // 更新 params 的 data 为 FormData 对象
+
+  const [err, res] = await to(Service(params));
+  if (!err && res) {
+    return res;
+  } else {
+    console.log('File Upload Error:', err);
+    return Promise.reject(err);
+  }
+}
+
+// 取消请求功能（可用于中止请求）
+export const CancelToken = axios.CancelToken;
+export function cancelRequest(cancelTokenSource) {
+  cancelTokenSource.cancel('Request cancelled');
 }
