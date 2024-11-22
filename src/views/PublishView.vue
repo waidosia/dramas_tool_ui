@@ -460,7 +460,7 @@ export default {
       //   console.error(error);
       //   this.$message.error("其他错误")
       // })
-      const res = await _post('/api/publish');
+      const res = await _post('/api/publish',{},this.form);
       if (res && res.code === 200) {
         ElMessage.success("发种信息已准备完成")
       } else {
