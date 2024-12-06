@@ -150,25 +150,6 @@
         </el-row>
       </el-card>
 
-      <!-- 操作按钮展示 -->
-<!--      <el-row :gutter="20" class="buttons-row mt-20">-->
-<!--        <el-col :span="5">-->
-<!--          <el-button block type="primary" @click="reName">1. 重命名文件与文件夹</el-button>-->
-<!--        </el-col>-->
-<!--        <el-col :span="5">-->
-<!--          <el-button block type="primary" @click="makeTorrent">2. 制作种子</el-button>-->
-<!--        </el-col>-->
-<!--        <el-col :span="5">-->
-<!--          <el-button block type="primary">3. 截图并上传图床</el-button>-->
-<!--        </el-col>-->
-<!--        <el-col :span="5">-->
-<!--          <el-button block type="primary">4. MediaInfo信息生成</el-button>-->
-<!--        </el-col>-->
-<!--         <el-col :span="4">-->
-<!--          <el-button block type="primary">5. 完成发种配置并保存</el-button>-->
-<!--        </el-col>-->
-<!--      </el-row>-->
-
       <el-row>
          <el-col >
           <el-button type="primary" @click="Start">一键启动</el-button>
@@ -283,34 +264,6 @@ export default {
       this.form.cover = file.name;
     },
     async submitPtGen(){
-      // axios
-      //     .post("http://127.0.0.1:5000/api/ptgen/send", { url: this.form.ptGen })
-      //     .then((response) => {
-      //        console.log(response)
-      //       if (response.data.code === 200) {
-      //         // 更新封面图
-      //         this.form.cover = response.data.data.poster;
-      //         // 中文名
-      //         this.form.cnName = response.data.data.cnName;
-      //         // 英文名
-      //         this.convertToPinyin()
-      //         // 年份
-      //         this.form.year = new Date().setFullYear(response.data.data.year);
-      //         // 简介
-      //         this.form.introduction = response.data.data.introduction;
-      //         //类型
-      //         this.form.category = response.data.data.category;
-      //         // 发布信息
-      //         this.form.publishInfo = response.data.data.format;
-      //         this.$message.success("获取豆瓣信息成功");
-      //       } else{
-      //         this.$message.error(response.data.message);
-      //       }
-      //     })
-      //     .catch((error) => {
-      //       console.error(error);
-      //       this.$message.error("在线链接上传失败");
-      //     });
       const res = await _post('/api/ptgen/send',{},{ url: this.form.ptGen });
       if (res && res.code === 200) {
         // 更新封面图
@@ -357,85 +310,6 @@ export default {
         ElMessage.warning("请输入有效的链接或选择一个文件");
       }
     },
-    // reName(){
-    //    axios
-    //       .post("http://127.0.0.1:5000/api/rename",
-    //           {
-    //             videoFolder: this.form.videoFolder,
-    //             cnName: this.form.cnName,
-    //             enName: this.form.enName,
-    //             year: this.form.year.getFullYear(),
-    //             season : this.form.season,
-    //             category: this.form.category,
-    //             source : this.form.source,
-    //             filmSource : this.form.filmSource,
-    //             team : this.form.team,
-    //           })
-    //       .then((response) => {
-    //          console.log(response)
-    //         if (response.data.code === 200) {
-    //           this.form.mainTitle = response.data.data.mainTitle;
-    //           this.form.first_file_name = response.data.data.first_file_name;
-    //           this.form.subTitle = response.data.data.subTitle;
-    //           this.fetchVideoFolders()
-    //            const match = this.videoFolders.find(folder => folder.path === response.data.data.newFolderPath);
-    //           if (match) {
-    //             this.form.videoFolder = response.data.data.newFolderPath;
-    //           } else if (this.videoFolders.length) {
-    //             // 如果未找到指定路径，则选择第一个文件夹
-    //             this.form.videoFolder = this.videoFolders[0].path;
-    //           }
-    //           this.$message.success("获取标准命名成功");
-    //         } else{
-    //           this.$message.error(response.data.message);
-    //         }
-    //       })
-    //       .catch((error) => {
-    //         console.error(error);
-    //         this.$message.error("在线链接上传失败");
-    //       });
-    // },
-    // makeTorrent(){
-    //   // 制作种子的逻辑
-    //   if (this.form.torrentPath !== "" ){
-    //     this.$confirm("已存在种子，确认重新制作？","提示",{
-    //       confirmButtonText:'确定',
-    //       cancelButtonText: '取消',
-    //       type: 'warnimg'
-    //     }).then((status) => {
-    //       if (status==="confirm") {
-    //         // 做种
-    //         this.form.torrentPath = "";
-    //         this.Torrent();
-    //       }
-    //     })
-    //   } else {
-    //     this.Torrent();
-    //   }
-    // },
-    // Torrent() {
-    //   if (this.form.videoFolder === null || this.form.videoFolder === undefined) {
-    //     this.$message.warning("请先选择视频文件夹")
-    //   } else {
-    //     axios
-    //         .post(
-    //             "http://127.0.0.1:5000/api/torrent",
-    //             {
-    //               videoFolder: this.form.videoFolder,
-    //             }).then(response => {
-    //       if (response.data.code === 200) {
-    //         this.form.torrentPath = response.data.data;
-    //         this.$message.success("制作种子成功");
-    //       } else {
-    //         this.$message.error(response.data.message);
-    //       }
-    //     })
-    //         .catch((error) => {
-    //           console.error(error);
-    //           this.$message.error("制作种子失败");
-    //         })
-    //   }
-    // },
     TorrentDownload(){
       if (this.form.torrentPath !== ""){
         this.Download(this.form.torrentPath);
@@ -447,19 +321,6 @@ export default {
     },
     // 一键启动
     async Start(){
-      // axios.post("http://127.0.0.1:5000/api/publish",
-      //     this.form,
-      //     ).then((response) => {
-      //       console.log(response)
-      //   if (response.data.code === 200) {
-      //     this.$message.info("发种信息已准备完成")
-      //   } else{
-      //     this.$message.error(response.data.message);
-      //   }
-      // }).catch(error => {
-      //   console.error(error);
-      //   this.$message.error("其他错误")
-      // })
       const res = await _post('/api/publish',{},this.form);
       if (res && res.code === 200) {
         ElMessage.success("发种信息已准备完成")

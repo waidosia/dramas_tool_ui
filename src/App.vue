@@ -15,7 +15,8 @@
         <!-- 左侧导航栏 -->
         <el-aside style="background-color: #f9f9f9; height: calc(100vh - 60px);" width="200px">
           <el-menu :default-active="activeMenu" @select="handleSelect">
-            <el-menu-item index="publish">发布</el-menu-item>
+            <el-menu-item index="publish">发布信息</el-menu-item>
+            <el-menu-item index="history">发布历史</el-menu-item>
             <el-menu-item index="config">配置</el-menu-item>
           </el-menu>
         </el-aside>
@@ -43,6 +44,8 @@ export default {
         this.$router.push('/publish');
       } else if (index === 'config') {
         this.$router.push('/config');
+      } else if (index === 'history') {
+        this.$router.push('/history');
       }
     },
   },

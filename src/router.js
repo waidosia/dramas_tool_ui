@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import PublishPage from '@/views/PublishView.vue';
 import ConfigPage from '@/views/Config.vue';
+import HistoryPage from "@/views/history.vue";
 
 const routes = [
     {
@@ -14,6 +15,10 @@ const routes = [
     {
         path: '/config',
         component: ConfigPage,
+    },
+    {
+        path: '/history',
+        component: HistoryPage,
     },
 ];
 
