@@ -1,83 +1,165 @@
 <template>
   <div id="app">
-    <!-- 最外层的el-container，包含顶部header和整个页面 -->
-    <el-container style="height: 100vh; width: 100vw; flex-direction: column;">
-
+    <el-container class="app-container">
       <!-- 顶部导航栏 -->
-      <el-header height="60px" style="background-color: #f2f2f2;">
-        <div style="display: flex; align-items: center; height: 100%; width: 100%;">
-          <span style="font-size: 24px; margin-left: 20px;">管理平台</span>
+      <el-header class="app-header">
+        <div class="header-content">
+          <span class="header-title">管理平台</span>
         </div>
       </el-header>
 
       <!-- 左侧导航和右侧内容区域 -->
-      <el-container style="flex: 1; display: flex; flex-direction: row;">
+      <el-container class="main-container">
         <!-- 左侧导航栏 -->
-        <el-aside style="background-color: #f9f9f9; height: calc(100vh - 60px);" width="200px">
-          <el-menu :default-active="activeMenu" @select="handleSelect">
-            <el-menu-item index="publish">发布信息</el-menu-item>
-            <el-menu-item index="history">发布历史</el-menu-item>
-            <el-menu-item index="config">配置</el-menu-item>
+        <el-aside class="app-aside">
+          <el-menu 
+            :default-active="activeMenu" 
+            @select="handleSelect"
+            class="app-menu"
+          >
+            <el-menu-item index="publish">
+              <el-icon><Upload /></el-icon>
+              <span>发布信息</span>
+            </el-menu-item>
+            <el-menu-item index="history">
+              <el-icon><List /></el-icon>
+              <span>发布历史</span>
+            </el-menu-item>
+            <el-menu-item index="config">
+              <el-icon><Setting /></el-icon>
+              <span>配置</span>
+            </el-menu-item>
           </el-menu>
         </el-aside>
 
         <!-- 右侧主要内容 -->
-        <el-main style="padding: 20px; background-color: #ffffff; height: calc(100vh - 60px); overflow-y: auto;">
-          <router-view></router-view> <!-- 通过路由加载相应的内容 -->
+        <el-main class="app-main">
+          <router-view v-slot="{ Component }">
+            <transition name="fade" mode="out-in">
+              <component :is="Component" />
+            </transition>
+          </router-view>
         </el-main>
       </el-container>
-
     </el-container>
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      activeMenu: 'config', // 默认选择"配置"页面
-    };
-  },
-  methods: {
-    handleSelect(index) {
-      if (index === 'publish') {
-        this.$router.push('/publish');
-      } else if (index === 'config') {
-        this.$router.push('/config');
-      } else if (index === 'history') {
-        this.$router.push('/history');
-      }
-    },
-  },
-};
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { Upload, List, Setting } from '@element-plus/icons-vue'
+
+const router = useRouter()
+const activeMenu = ref('config')
+
+const handleSelect = (index) => {
+  router.push(`/${index}`)
+}
 </script>
 
 <style scoped>
-/* 为整个页面设置全局的布局，使页面在不同分辨率下保持良好的显示 */
+/* 全局样式 */
 html, body, #app {
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-.el-container {
+/* 应用容器 */
+.app-container {
+  height: 100vh;
+  width: 100vw;
+  flex-direction: column;
+}
+
+/* 顶部导航栏 */
+.app-header {
+  height: 60px;
+  background-color: #f2f2f2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header-content {
   display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding: 0 20px;
 }
 
-.el-aside {
-  border-right: 1px solid #ddd; /* 给左侧导航加上边框，使页面层次更分明 */
+.header-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
 }
 
-.el-main {
-  flex: 1; /* 使右侧内容区域占满剩余的水平空间 */
+/* 主容器 */
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
   overflow: hidden;
 }
 
-.el-header {
-  width: 100%; /* 使灰色的顶部导航栏占满全屏宽度 */
+/* 侧边栏 */
+.app-aside {
+  width: 200px;
+  background-color: #f9f9f9;
+  border-right: 1px solid #e6e6e6;
+  transition: width 0.3s;
 }
 
-.el-menu-item {
-  text-align: left;
+.app-menu {
+  border-right: none;
+  height: 100%;
+}
+
+.app-menu :deep(.el-menu-item) {
+  height: 50px;
+  line-height: 50px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.app-menu :deep(.el-menu-item .el-icon) {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+/* 主内容区 */
+.app-main {
+  padding: 20px;
+  background-color: #ffffff;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+
+/* 路由过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 768px) {
+  .app-aside {
+    width: 64px;
+  }
+  
+  .app-menu :deep(.el-menu-item span) {
+    display: none;
+  }
+  
+  .app-menu :deep(.el-menu-item .el-icon) {
+    margin-right: 0;
+  }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <el-card class="card" shadow="hover">
-    <div slot="header" class="card-header">发布历史</div>
+    <div slot="header" class="card-header">整理历史</div>
 
     <el-table :data="publishData" border style="width: 100%">
       <el-table-column prop="id" label="ID" width="50" />
@@ -33,13 +33,17 @@
       </el-table-column>
       <el-table-column prop="category" label="分类" width="100" />
       <el-table-column prop="mainTitle" label="主标题" width="150" >
-        <template #default="scope">
-          <span v-html="truncate(scope.row.mainTitle)"></span>
-        </template>
+         <template #default="scope">
+            <el-tooltip class="item" effect="dark" :content="scope.row.mainTitle" placement="top">
+              <span v-html="truncate(scope.row.mainTitle)"></span>
+            </el-tooltip>
+          </template>
       </el-table-column>
       <el-table-column prop="subTitle" label="副标题" width="150" >
         <template #default="scope">
+           <el-tooltip class="item" effect="dark" :content="scope.row.subTitle" placement="top">
           <span v-html="truncate(scope.row.subTitle)"></span>
+             </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column prop="screenshot1_link" label="截图1" width="90">
@@ -47,9 +51,9 @@
           <a :href="scope.row.screenshot1_link" target="_blank">查看</a>
         </template>
       </el-table-column>
-      <el-table-column prop="video_screenshot_link" label="视频截图" width="90">
+      <el-table-column prop="videoScreenshotLink" label="视频缩略图" width="90">
         <template #default="scope">
-          <a :href="scope.row.video_screenshot_link" target="_blank">查看</a>
+          <a :href="scope.row.videoScreenshotLink" target="_blank">查看</a>
         </template>
       </el-table-column>
 <!--      <el-table-column prop="publishInfo" label="发布信息" >-->
@@ -101,12 +105,6 @@ export default {
       return text;
     },
     async fetchData(page = 1) {
-      // 模拟请求 API 获取数据
-      //   const response = await fetch(`/api/publish/history?page=${page}&size=${this.pageSize}`);
-      //   const result = await response.json();
-      //   this.publishData = result.data;
-      //   this.total = result.total;
-      // }
        const res = await _get(`/api/publish/history?page=${page}&size=${this.pageSize}`, {});
        if (res){
         if (res.code === 200){

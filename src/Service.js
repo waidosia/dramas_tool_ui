@@ -1,135 +1,185 @@
 import axios from 'axios'
 import to from 'await-to-js'
+
+// API 基础配置
 const ConfigBaseURL = 'http://127.0.0.1:5000/'
 
-
-//使用create方法创建axios实例
+/**
+ * 创建 axios 实例
+ * @type {import('axios').AxiosInstance}
+ */
 export const Service = axios.create({
   // timeout: 10000, // 请求超时时间
   baseURL: ConfigBaseURL,
-  method: 'post',
-  headers: {
-    'Content-Type': 'application/json;charset=UTF-8'
-  }
+  // method: 'post',
+  // headers: {
+  //   'Content-Type': 'application/json;charset=UTF-8'
+  // }
 })
 
-// 添加请求拦截器
-Service.interceptors.request.use(config => {
-  return config
-})
-// 添加响应拦截器
-Service.interceptors.response.use(response => {
-  // console.log(response)
-  return response.data
-}, error => {
-  return Promise.reject(error)
-})
+// 请求拦截器
+Service.interceptors.request.use(
+  config => config,
+  error => Promise.reject(error)
+)
 
-// 使用await-to-js去捕获await时的错误
+// 响应拦截器
+Service.interceptors.response.use(
+  response => response.data,
+  error => Promise.reject(error)
+)
+
+/**
+ * 检查对象是否有效
+ * @param {*} obj - 待检查的对象
+ * @returns {boolean} - 是否为有效对象
+ */
 export function isObj(obj) {
-  const typeCheck = typeof obj!=='undefined' && typeof obj === 'object' && obj !== null
-  return typeCheck && Object.keys(obj).length > 0
+  return typeof obj !== 'undefined' &&
+         typeof obj === 'object' &&
+         obj !== null &&
+         Object.keys(obj).length > 0
 }
 
-//封装的get
-export async function _get(url, qs,headers) {
+/**
+ * 统一的请求处理函数
+ * @param {Object} params - 请求参数
+ * @returns {Promise} - 请求结果
+ */
+async function handleRequest(params) {
+  const [err, res] = await to(Service(params))
+  if (err) {
+    console.error('Request Error:', err)
+    return Promise.reject(err)
+  }
+  return res
+}
+
+/**
+ * GET 请求封装
+ * @param {string} url - 请求地址
+ * @param {Object} [qs] - 查询参数
+ * @param {Object} [headers] - 请求头
+ * @returns {Promise} - 请求结果
+ */
+export async function _get(url, qs, headers) {
   const params = {
     url,
     method: 'get',
     params: isObj(qs) ? qs : {}
   }
-  if(isObj(headers)){params.headers = headers}
-  const [err, res] = await to(Service(params))
-  if (!err && res) {
-    return res
-  } else {
-    return console.log(err)
+  if (isObj(headers)) {
+    params.headers = headers
   }
+  return handleRequest(params)
 }
 
-//封装的post
-export async function _post(url, qs, body,headers) {
+/**
+ * POST 请求封装
+ * @param {string} url - 请求地址
+ * @param {Object} [qs] - 查询参数
+ * @param {Object} [body] - 请求体
+ * @param {Object} [headers] - 请求头
+ * @returns {Promise} - 请求结果
+ */
+export async function _post(url, qs, body, headers) {
   const params = {
     url,
     method: 'post',
     params: isObj(qs) ? qs : {},
     data: isObj(body) ? body : {}
   }
-  if(isObj(headers)){params.headers = headers}
-  const [err, res] = await to(Service(params))
-  if (!err && res) {
-    return res
-  } else {
-    return console.log(err)
+  if (isObj(headers)) {
+    params.headers = {
+    'Content-Type': 'application/json',
+    ...params.headers
+    }
   }
+  return handleRequest(params)
 }
 
-
-//封装的put
-export async function _put(url, qs, body,headers) {
+/**
+ * PUT 请求封装
+ * @param {string} url - 请求地址
+ * @param {Object} [qs] - 查询参数
+ * @param {Object} [body] - 请求体
+ * @param {Object} [headers] - 请求头
+ * @returns {Promise} - 请求结果
+ */
+export async function _put(url, qs, body, headers) {
   const params = {
     url,
     method: 'put',
     params: isObj(qs) ? qs : {},
     data: isObj(body) ? body : {}
   }
-  if(isObj(headers)){params.headers = headers}
-  const [err, res] = await to(Service(params))
-  if (!err && res) {
-    return res
-  } else {
-    return console.log(err)
+  if (isObj(headers)) {
+    params.headers = {
+    'Content-Type': 'application/json',
+    ...params.headers
+    }
   }
+  return handleRequest(params)
 }
 
-//封装的del
-export async function _del(url, qs,headers) {
+/**
+ * DELETE 请求封装
+ * @param {string} url - 请求地址
+ * @param {Object} [qs] - 查询参数
+ * @param {Object} [headers] - 请求头
+ * @returns {Promise} - 请求结果
+ */
+export async function _del(url, qs, headers) {
   const params = {
     url,
     method: 'delete',
     params: isObj(qs) ? qs : {}
   }
-  if(isObj(headers)){params.headers = headers}
-  const [err, res] = await to(Service(params))
-  if (!err && res) {
-    return res
-  } else {
-    return console.log(err)
+  if (isObj(headers)) {
+    params.headers = headers
   }
+  return handleRequest(params)
 }
 
-// 上传文件封装（支持multipart/form-data）
+/**
+ * 文件上传封装
+ * @param {string} url - 上传地址
+ * @param {File} file - 文件对象
+ * @param {Object} [formData] - 额外的表单数据
+ * @param {Object} [headers] - 请求头
+ * @returns {Promise} - 上传结果
+ */
 export async function _file(url, file, formData = {}, headers = {}) {
+  const form = new FormData()
+  form.append('file', file)
+
+  // 添加额外的表单数据
+  Object.entries(formData).forEach(([key, value]) => {
+    form.append(key, value)
+  })
+
+  const finalHeaders = { ...headers };
+   if (finalHeaders['Content-Type']) {
+    delete finalHeaders['Content-Type'];
+  }
+
   const params = {
     url,
     method: 'post',
-    headers: {
-      'Content-Type': 'multipart/form-data',
-      ...headers
-    },
-    data: formData
-  };
-
-  // 将文件附加到 FormData 中
-  const form = new FormData();
-  form.append('file', file);
-  Object.entries(formData).forEach(([key, value]) => {
-    form.append(key, value);
-  });
-
-  params.data = form;  // 更新 params 的 data 为 FormData 对象
-
-  const [err, res] = await to(Service(params));
-  if (!err && res) {
-    return res;
-  } else {
-    console.log('File Upload Error:', err);
-    return Promise.reject(err);
+    headers: finalHeaders,
+    data: form
   }
+
+  return handleRequest(params)
 }
 
-// 取消请求功能（可用于中止请求）
-export const CancelToken = axios.CancelToken;
+// 导出取消请求相关功能
+export const CancelToken = axios.CancelToken
+
+/**
+ * 取消请求
+ * @param {import('axios').CancelTokenSource} cancelTokenSource - 取消令牌源
+ */
 export function cancelRequest(cancelTokenSource) {
-  cancelTokenSource.cancel('Request cancelled');
+  cancelTokenSource.cancel('Request cancelled')
 }
