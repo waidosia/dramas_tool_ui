@@ -331,6 +331,12 @@ export default {
         screenshotIcon:'',
         // 第一集路径
         firstFileName: '',
+        // 分辨率
+        resolution: '',
+        // 视频编码
+        video_codec: '',
+        // 音频编码
+        audio_codec: ''
       },
       videoFolders: [],
       selectedFile: null,

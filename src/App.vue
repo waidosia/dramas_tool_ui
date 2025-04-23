@@ -23,7 +23,7 @@
             </el-menu-item>
             <el-menu-item index="history">
               <el-icon><List /></el-icon>
-              <span>发布历史</span>
+              <span>发种历史</span>
             </el-menu-item>
             <el-menu-item index="config">
               <el-icon><Setting /></el-icon>
@@ -51,7 +51,7 @@ import { useRouter } from 'vue-router'
 import { Upload, List, Setting } from '@element-plus/icons-vue'
 
 const router = useRouter()
-const activeMenu = ref('config')
+const activeMenu = ref('publish')
 
 const handleSelect = (index) => {
   router.push(`/${index}`)

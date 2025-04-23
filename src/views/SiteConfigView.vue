@@ -12,10 +12,18 @@
           {{ formatType(scope.row.type) }}
         </template>
       </el-table-column>
+      <el-table-column label="站点地址" prop="url"/>
       <el-table-column label="是否可用" prop="is_available">
         <template #default="scope">
           <el-tag :type="scope.row.is_available ? 'success' : 'danger'">
             {{ scope.row.is_available ? '可用' : '不可用' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否使用代理" prop="is_proxy">
+        <template #default="scope">
+          <el-tag :type="scope.row.is_proxy ? 'success' : 'danger'">
+            {{ scope.row.is_proxy ? '使用' : '不使用' }}
           </el-tag>
         </template>
       </el-table-column>
@@ -42,13 +50,20 @@
             <el-option :value="3" label="猫站"/>
             <el-option :value="4" label="红叶"/>
             <el-option :value="5" label="麒麟"/>
+            <el-option :value="6" label="织梦"/>
           </el-select>
+        </el-form-item>
+        <el-form-item label="地址" label-width="80px">
+          <el-input v-model="form.url"/>
         </el-form-item>
         <el-form-item label="Cookie" label-width="80px">
           <el-input v-model="form.cookie"/>
         </el-form-item>
-        <el-form-item label="是否可用" label-width="80px">
+        <el-form-item label="可用" label-width="80px">
           <el-switch v-model="form.is_available"/>
+        </el-form-item>
+        <el-form-item label="代理" label-width="80px">
+          <el-switch v-model="form.is_proxy"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -153,7 +168,6 @@ export default {
       }
     },
     formatType(type) {
-      // 这里将1转化为QB，2转化为TR
       switch (type) {
         case 1:
           return '北洋';
@@ -165,6 +179,8 @@ export default {
           return '红叶';
         case 5:
           return '麒麟';
+        case 6:
+          return '织梦';
         default:
           return '未知类型';
       }

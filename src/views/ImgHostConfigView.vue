@@ -37,10 +37,10 @@
         <el-form-item label="Token/Cookie">
           <el-input v-model="editForm.key_or_cookie"></el-input>
         </el-form-item>
-        <el-form-item label="是否启用">
+        <el-form-item label="启用">
           <el-switch v-model="editForm.is_available"></el-switch>
         </el-form-item>
-         <el-form-item label="是否使用代理">
+         <el-form-item label="代理">
           <el-switch v-model="editForm.is_proxy"></el-switch>
         </el-form-item>
       </el-form>
